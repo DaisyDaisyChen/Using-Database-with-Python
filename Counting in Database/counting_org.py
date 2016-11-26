@@ -1,3 +1,6 @@
+#This application will read the mailbox data (mbox.txt) count up the number email messages per organization (i.e. domain name of the email address) 
+#using a database with CREATE TABLE schema to maintain the counts.
+
 import sqlite3
 
 conn = sqlite3.connect('counting_org.sqlite')
@@ -24,7 +27,12 @@ for line in fh:
         cur.execute('''INSERT INTO Counts (org, count) VALUES (?, 1)''', (org, ))
     else:
         cur.execute('UPDATE Counts SET count=count+1 WHERE org = ?', (org, ))
+    # This statement commits outstanding changes to disk each 
+    # time through the loop - the program can be made faster 
+    # by moving the commit so it runs only after the loop completes
+    
     conn.commit()
+    #The program can be speeded up greatly by moving the commit operation outside of the loop.
 
 sqlstr = 'SELECT org, count FROM Counts ORDER BY count DESC LIMIT 10'
 
